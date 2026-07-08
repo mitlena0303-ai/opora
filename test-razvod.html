@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест: ты уже прошла развод, или всё ещё живёшь внутри него — Опора</title>
+<meta name="description" content="Семь вопросов, две минуты. Узнай, на какой стадии проживания развода ты находишься сейчас, и что поможет двигаться дальше.">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Тест: ты уже прошла развод, или всё ещё живёшь внутри него">
+<meta property="og:description" content="Семь вопросов, две минуты. Узнай, на какой стадии ты сейчас.">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  /* ===== Quiz-specific additions, built on the same design tokens ===== */
+  .quiz-section {
+    padding: 56px 0 96px;
+    min-height: 70vh;
+  }
+  .quiz-shell {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .quiz-card {
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 44px;
+  }
+
+  /* Progress */
+  .quiz-progress-wrap {
+    max-width: 680px;
+    margin: 0 auto 28px;
+  }
+  .quiz-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 8px;
+  }
+  .quiz-progress-track {
+    height: 6px;
+    background: var(--cream-dark);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .quiz-progress-fill {
+    height: 100%;
+    background: var(--terracotta);
+    border-radius: 999px;
+    transition: width 0.35s ease;
+    width: 0%;
+  }
+
+  /* Intro */
+  .quiz-intro { text-align: center; }
+  .quiz-intro .eyebrow { display: block; }
+  .quiz-intro h1 {
+    font-size: 34px;
+    margin-bottom: 18px;
+  }
+  .quiz-meta {
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    margin: 28px 0 8px;
+    flex-wrap: wrap;
+  }
+  .quiz-meta-item {
+    font-size: 14px;
+    color: var(--ink-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .quiz-meta-item .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--sage);
+  }
+
+  /* Question */
+  .quiz-question-num {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--terracotta-dark);
+    margin-bottom: 12px;
+  }
+  .quiz-question h2 {
+    font-size: 24px;
+    margin-bottom: 26px;
+  }
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .quiz-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    text-align: left;
+    width: 100%;
+    padding: 18px 20px;
+    background: var(--cream-dark);
+    border: 1.5px solid transparent;
+    border-radius: var(--radius-sm);
+    font-family: var(--sans);
+    font-size: 15.5px;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .quiz-option:hover {
+    border-color: var(--terracotta);
+    background: var(--white);
+    transform: translateY(-1px);
+  }
+  .quiz-option .letter {
+    flex: none;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--plum-deep);
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .quiz-option:hover .letter {
+    background: var(--terracotta);
+    color: var(--white);
+  }
+
+  .quiz-nav-back {
+    display: inline-block;
+    margin-top: 24px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  .quiz-nav-back:hover { color: var(--terracotta-dark); }
+
+  /* Result */
+  .quiz-result-badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--sage);
+    background: rgba(124,139,111,0.12);
+    padding: 6px 16px;
+    border-radius: 999px;
+    margin-bottom: 18px;
+  }
+  .quiz-result h2 {
+    font-size: 28px;
+    margin-bottom: 18px;
+  }
+  .quiz-result p {
+    color: var(--ink-soft);
+    font-size: 16.5px;
+  }
+  .quiz-result-next {
+    margin-top: 26px;
+    padding: 20px 22px;
+    background: var(--cream-dark);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    color: var(--plum-deep);
+    font-weight: 600;
+  }
+  .quiz-result-actions {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .quiz-retake {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .quiz-retake:hover { color: var(--terracotta-dark); }
+
+  .quiz-screen { display: none; }
+  .quiz-screen.is-active { display: block; animation: quizFadeIn 0.4s ease; }
+  @keyframes quizFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 600px) {
+    .quiz-card { padding: 28px 22px; }
+    .quiz-intro h1 { font-size: 27px; }
+    .quiz-question h2 { font-size: 20px; }
+    .quiz-result h2 { font-size: 23px; }
+    .quiz-meta { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap">
+    <a href="index.html" class="logo" style="text-decoration:none;">Опора<span>.</span></a>
+    <a href="index.html#cta" class="btn btn--ghost header-cta">Записаться на бесплатную диагностику</a>
+  </div>
+</header>
+
+<section class="quiz-section">
+  <div class="wrap">
+
+    <div class="quiz-progress-wrap" id="progressWrap" style="display:none;">
+      <div class="quiz-progress-label">
+        <span id="progressLabel">Вопрос 1 из 7</span>
+        <span id="progressPercent">0%</span>
+      </div>
+      <div class="quiz-progress-track"><div class="quiz-progress-fill" id="progressFill"></div></div>
+    </div>
+
+    <div class="quiz-shell">
+      <div class="quiz-card">
+
+        <!-- INTRO -->
+        <div class="quiz-screen is-active" id="screen-intro">
+          <div class="quiz-intro">
+            <span class="eyebrow">Тест · 7 вопросов · 2 минуты</span>
+            <h1>Ты уже прошла развод, или всё ещё живёшь внутри него?</h1>
+            <p class="lede center">Семь коротких вопросов о том, что происходит внутри сейчас. Никаких «правильных» ответов — только честный взгляд на то, где ты находишься на самом деле.</p>
+            <div class="quiz-meta">
+              <span class="quiz-meta-item"><span class="dot"></span>Анонимно</span>
+              <span class="quiz-meta-item"><span class="dot"></span>2 минуты</span>
+              <span class="quiz-meta-item"><span class="dot"></span>Персональный результат</span>
+            </div>
+            <a href="#" class="btn btn--primary" id="startBtn" style="margin-top:24px;">Начать тест</a>
+          </div>
+        </div>
+
+        <!-- QUESTIONS mount point -->
+        <div class="quiz-screen" id="screen-question">
+          <div class="quiz-question">
+            <div class="quiz-question-num" id="qNum"></div>
+            <h2 id="qText"></h2>
+            <div class="quiz-options" id="qOptions"></div>
+          </div>
+          <button class="quiz-nav-back" id="backBtn">← Назад</button>
+        </div>
+
+        <!-- RESULT mount point -->
+        <div class="quiz-screen" id="screen-result">
+          <div class="quiz-result">
+            <span class="quiz-result-badge" id="resultRange"></span>
+            <h2 id="resultTitle"></h2>
+            <p id="resultBody"></p>
+            <div class="quiz-result-next">
+              <p id="resultNext" style="margin:0;"></p>
+            </div>
+            <div class="quiz-result-actions">
+              <a href="#" class="btn btn--primary" id="resultCta" target="_blank" rel="noopener"></a>
+              <button class="quiz-retake" id="retakeBtn">Пройти тест ещё раз</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© Александра Милькова · Программа «Опора»</p>
+    <p class="legal-links">
+      <a href="legal/privacy-policy.PDF" target="_blank" rel="noopener">Политика конфиденциальности</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const questions = [
+    {
+      text: "Когда ты сейчас думаешь про бывшего, что происходит внутри?",
+      options: [
+        { letter: "А", text: "Всё ещё колотит, будто это случилось вчера", score: 1 },
+        { letter: "Б", text: "Приходит злость или обида, но быстро отпускает", score: 2 },
+        { letter: "В", text: "В основном спокойно, иногда царапает", score: 3 },
+        { letter: "Г", text: "Почти ничего, будто про другого человека", score: 4 },
+      ],
+    },
+    {
+      text: "Что творится в голове перед сном?",
+      options: [
+        { letter: "А", text: "Прокручиваю разговоры, ищу где сорвалась и что можно было сделать иначе", score: 1 },
+        { letter: "Б", text: "Иногда залипаю на переписке или его страницах", score: 2 },
+        { letter: "В", text: "Думаю больше про завтрашние дела, чем про него", score: 3 },
+        { letter: "Г", text: "Сплю нормально, мысли про него почти не всплывают", score: 4 },
+      ],
+    },
+    {
+      text: "Как ты реагируешь, когда узнаёшь, что у него кто-то появился?",
+      options: [
+        { letter: "А", text: "Внутри всё обрывается, будто дали под дых", score: 1 },
+        { letter: "Б", text: "Неприятно, но быстро переключаюсь на свои дела", score: 2 },
+        { letter: "В", text: "Немного царапает, а потом забываю", score: 3 },
+        { letter: "Г", text: "Спокойно, даже рада, что у него всё наладилось", score: 4 },
+      ],
+    },
+    {
+      text: "Если подруга спросит, как твоя жизнь сейчас, что ты честно ответишь?",
+      options: [
+        { letter: "А", text: "Тащу всё одна, дом, дети, работа, а внутри пусто", score: 1 },
+        { letter: "Б", text: "Держусь, но чувствую, что бегу как белка в колесе", score: 2 },
+        { letter: "В", text: "В целом нормально, хотя иногда накрывает", score: 3 },
+        { letter: "Г", text: "Появилась своя жизнь, свои планы, вкус к вещам вернулся", score: 4 },
+      ],
+    },
+    {
+      text: "Как у тебя дела с бытом и деньгами без него?",
+      options: [
+        { letter: "А", text: "Каждый месяц как выживание, считаю копейки и злюсь на эту зависимость", score: 1 },
+        { letter: "Б", text: "С основным разобралась, но тревога рядом", score: 2 },
+        { letter: "В", text: "Более-менее выстроила систему, справляюсь", score: 3 },
+        { letter: "Г", text: "Чувствую опору, знаю, откуда придут деньги", score: 4 },
+      ],
+    },
+    {
+      text: "Что чувствуешь, когда видишь чужие «целые семьи»?",
+      options: [
+        { letter: "А", text: "Зависть режет, сравниваю себя с ними и проигрываю", score: 1 },
+        { letter: "Б", text: "Немного тяжело, потом отпускает", score: 2 },
+        { letter: "В", text: "Радуюсь за них, у меня своя история", score: 3 },
+        { letter: "Г", text: "Вообще не сравниваю, живу свою жизнь", score: 4 },
+      ],
+    },
+    {
+      text: "Как часто прокручиваешь прошлое, ищешь где что пошло не так?",
+      options: [
+        { letter: "А", text: "Почти каждый день, застряла в этом", score: 1 },
+        { letter: "Б", text: "Раз в неделю, когда что-то напоминает", score: 2 },
+        { letter: "В", text: "Редко, разве что в разговоре с подругой или психологом", score: 3 },
+        { letter: "Г", text: "Не прокручиваю, смотрю вперёд", score: 4 },
+      ],
+    },
+  ];
+
+  const results = [
+    {
+      min: 7, max: 11,
+      title: "Ты всё ещё внутри шторма",
+      body: "Развод для тебя не закрытая глава, а рана, которая до сих пор кровит. Мысли о бывшем сбивают дыхание, ночи проходят в прокрутке одних и тех же разговоров, а быт держится на голой воле. Это не слабость и не то, что ты делаешь что-то не так. Так выглядит острая фаза, через неё правда нужно пройти, и правда можно пройти быстрее, если рядом есть опора, а не только собственные силы.",
+      next: "Дальше пришлём тебе гид про первые шаги, когда штормит сильнее всего, без советов из серии «просто отпусти».",
+      ctaText: "Получить гид «Первые 7 дней»",
+      ctaLink: "https://t.me/alexgureeva?text=Здравствуйте! Прошла тест «Опоры», результат — «Внутри шторма». Хочу получить гид «Первые 7 дней»",
+    },
+    {
+      min: 12, max: 17,
+      title: "Тащишь, но не живёшь",
+      body: "Снаружи всё держится: дом стоит, дети накормлены, работа идёт. Внутри пусто, будто ты помножила себя на ноль ради того, чтобы остальные не заметили, что тебе тяжело. Это самая незаметная стадия, потому что со стороны кажется, что «уже нормально». На деле ты просто разучилась замечать себя в этом списке дел.",
+      next: "Дальше покажем, как вернуть немного опоры себе, не разваливая при этом всё, что уже держишь.",
+      ctaText: "Получить голосовое про ночные мысли",
+      ctaLink: "https://t.me/alexgureeva?text=Здравствуйте! Прошла тест «Опоры», результат — «Тащишь, но не живёшь». Хочу получить голосовое про ночные мысли",
+    },
+    {
+      min: 18, max: 23,
+      title: "Почти отпустила, но старое ещё держит",
+      body: "Ты уже во многом справилась, у тебя есть дни, когда легко, есть план, есть силы. Но иногда старое цепляет за ногу: то нужный человек снова не тот, то зависть кольнёт, то ночью накатит без повода. Это стадия на полпути, обидно застрять именно тут, когда основное уже сделано.",
+      next: "Дальше разберём, что за сценарий тянет назад именно в такие моменты.",
+      ctaText: "Получить гайд «Почему ты опять выбираешь не того»",
+      ctaLink: "https://t.me/alexgureeva?text=Здравствуйте! Прошла тест «Опоры», результат — «Почти отпустила». Хочу получить гайд «Почему ты опять выбираешь не того»",
+    },
+    {
+      min: 24, max: 28,
+      title: "Ты вышла, хотя сама не заметила",
+      body: "У тебя получилось то, из-за чего многие годами ходят по кругу. Опора есть, быт выстроен, прошлое не рулит настроением. Возможно, ты даже не считала это достижением, просто жила. Это и есть та точка, откуда видно, куда расти дальше, не выживать, а строить.",
+      next: "Дальше покажем, что имеет смысл делать на этом этапе, чтобы не откатиться назад в спокойные с виду месяцы.",
+      ctaText: "Записаться на живой эфир",
+      ctaLink: "https://t.me/alexgureeva?text=Здравствуйте! Прошла тест «Опоры», результат — «Вышла, не заметила». Интересно узнать про живой эфир / программу",
+    },
+  ];
+
+  let current = 0;
+  const answers = new Array(questions.length).fill(null);
+
+  const screens = {
+    intro: document.getElementById("screen-intro"),
+    question: document.getElementById("screen-question"),
+    result: document.getElementById("screen-result"),
+  };
+  const progressWrap = document.getElementById("progressWrap");
+  const progressLabel = document.getElementById("progressLabel");
+  const progressPercent = document.getElementById("progressPercent");
+  const progressFill = document.getElementById("progressFill");
+  const qNum = document.getElementById("qNum");
+  const qText = document.getElementById("qText");
+  const qOptions = document.getElementById("qOptions");
+  const backBtn = document.getElementById("backBtn");
+
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove("is-active"));
+    screens[name].classList.add("is-active");
+    screens[name].closest(".quiz-card").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function updateProgress() {
+    const pct = Math.round((current / questions.length) * 100);
+    progressLabel.textContent = `Вопрос ${current + 1} из ${questions.length}`;
+    progressPercent.textContent = pct + "%";
+    progressFill.style.width = pct + "%";
+  }
+
+  function renderQuestion() {
+    progressWrap.style.display = "block";
+    updateProgress();
+    const q = questions[current];
+    qNum.textContent = `Вопрос ${current + 1} из ${questions.length}`;
+    qText.textContent = q.text;
+    qOptions.innerHTML = "";
+    q.options.forEach(opt => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "quiz-option";
+      btn.innerHTML = `<span class="letter">${opt.letter}</span><span>${opt.text}</span>`;
+      btn.addEventListener("click", () => selectAnswer(opt.score));
+      qOptions.appendChild(btn);
+    });
+    backBtn.style.visibility = current === 0 ? "hidden" : "visible";
+    showScreen("question");
+  }
+
+  function selectAnswer(score) {
+    answers[current] = score;
+    if (current < questions.length - 1) {
+      current++;
+      renderQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    const total = answers.reduce((sum, s) => sum + (s || 0), 0);
+    const result = results.find(r => total >= r.min && total <= r.max) || results[0];
+    document.getElementById("resultRange").textContent = `${total} баллов из 28`;
+    document.getElementById("resultTitle").textContent = result.title;
+    document.getElementById("resultBody").textContent = result.body;
+    document.getElementById("resultNext").textContent = result.next;
+    const cta = document.getElementById("resultCta");
+    cta.textContent = result.ctaText;
+    cta.href = result.ctaLink;
+    progressWrap.style.display = "none";
+    showScreen("result");
+  }
+
+  document.getElementById("startBtn").addEventListener("click", (e) => {
+    e.preventDefault();
+    current = 0;
+    renderQuestion();
+  });
+
+  backBtn.addEventListener("click", () => {
+    if (current > 0) {
+      current--;
+      renderQuestion();
+    }
+  });
+
+  document.getElementById("retakeBtn").addEventListener("click", () => {
+    current = 0;
+    answers.fill(null);
+    progressWrap.style.display = "none";
+    showScreen("intro");
+  });
+})();
+</script>
+
+</body>
+</html>
